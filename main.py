@@ -6,6 +6,7 @@ import signal
 import socket
 
 # Constants\NN = "North"
+N = "North"
 S = "South"
 W = "West"
 E = "East"
@@ -85,7 +86,7 @@ def coordinator(normal_queue, priority_queue, traffic_light, display_socket):
 # Display Process
 def display_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("localhost", 9999))
+    server.bind(("localhost", 6666))
     server.listen(1)
     print("[Display] Waiting for connection...")
     conn, addr = server.accept()
@@ -101,26 +102,32 @@ def main():
     normal_queue = mp.Queue()
     priority_queue = mp.Queue()
     traffic_light = TrafficLight()
+
+    # Start the display server first
+    display_process = mp.Process(target=display_server)
+    display_process.start()
+
+    time.sleep(1)  # Give some time for the server to start
+
     display_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    display_socket.connect(("localhost", 9999))
-    
+    display_socket.connect(("localhost", 6666))  # Connect after server is up
+
     light_process = mp.Process(target=light_controller, args=(traffic_light,))
     coordinator_process = mp.Process(target=coordinator, args=(normal_queue, priority_queue, traffic_light, display_socket))
     normal_traffic_process = mp.Process(target=normal_traffic_gen, args=(normal_queue,))
     priority_traffic_process = mp.Process(target=priority_traffic_gen, args=(priority_queue, light_process.pid))
-    display_process = mp.Process(target=display_server)
-    
+
     light_process.start()
     coordinator_process.start()
     normal_traffic_process.start()
     priority_traffic_process.start()
-    display_process.start()
-    
+
     light_process.join()
     coordinator_process.join()
     normal_traffic_process.join()
     priority_traffic_process.join()
     display_process.join()
+
 
 if __name__ == "__main__":
     main()
