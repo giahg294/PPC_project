@@ -1,0 +1,31 @@
+at least 5 processes:
+• normal_traffic_gen: 
+    simulates the generation of normal traffic. For each generated vehicle, it chooses source and destination road sections randomly or according to some predefined criteria.
+• priority_traffic_gen: 
+    simulates the generation of high-priority traffic. For each generated vehicle, it chooses source and destination road sections randomly or according to some predefined criteria.
+• coordinator: 
+    allows all vehicles (priority or not) to pass according to traffic regulations and the state of traffic lights.
+• lights: 
+    changes the color of the lights at regular intervals in normal mode, it is notified by priority_traffic_gen to set the lights to the appropriate color.
+• display: 
+    allows the operator to observe the simulation in real-time.
+
+Inter-process communication: 
+    The 4 sections of the crossroads are represented by MESSAGES QUEUES, one per section, 
+    vehicles are represented via messages coding the vehicle’s attributes. 
+    The approach of a high-priority vehicle is notified to the lights process by a SIGNAL. 
+    The state of traffic lights is stored in a SHARED MEMORY, accessible to the coordinator processes, at least. 
+    Communication with the display process is carried out via SOCKETS.
+
+A diagram to better visualize the interactions between processes/threads. -> State machine diagrams 
+(The following points need to be addressed and justified):
+• relationships between processes (parent-child or unrelated), define a parent-child relationship only if absolutely necessary,
+• message queues used in communication and messages exchanged between processes along with their types, content and order of exchange,
+• sockets used in communication between processes along with exchanged data, their content and order of exchange,
+• data structures stored in shared memory, their types and how they are accessed,
+• signals exchanged between processes along with their types and associated handlers,
+• synchronization primitives to protect access to shared resources or to count resources,
+• tubes involved in pairwise process communication, if any, and their types.
+
+Write down a Python-like pseudo-code of main algorithms and data structures for each process/thread
+to help you in implementation.
