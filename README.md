@@ -1,4 +1,4 @@
-# Reste a faire : Message queues #
+# Reste a faire :
 ## Inter-process communication: Message queues
 The 4 sections of the crossroads are represented by message queues,
  one per section, vehicles are represented via messages coding the vehicle’s attributes. The approach of
