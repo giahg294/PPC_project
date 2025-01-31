@@ -1,5 +1,7 @@
 # Reste a faire :
 ## Output plus joli? 
+## Plusieurs .py au lieu d'un seul? par ex, serveur.py + joueur.py ?
+
 ## Inter-process communication: Message queues ? Deja resolu.
 The 4 sections of the crossroads are represented by message queues,
  one per section, vehicles are represented via messages coding the vehicle’s attributes. The approach of
@@ -24,7 +26,7 @@ South, the other West-East. This intersection is managed by 4 bicolor lights, on
  desired direction. In this case, only one of the 4 lights is set to green. We assume that no vehicle gets
  stuck in the middle of the intersection, i.e. there are no traffic jams. 
  
-# Technical specifications #
+# Technical specifications 
 
  • normal_traffic_gen: simulates the generation of normal traffic. For each generated vehicle, it
  chooses source and destination road sections randomly or according to some predefined criteria.
@@ -41,7 +43,15 @@ South, the other West-East. This intersection is managed by 4 bicolor lights, on
  a high-priority vehicle is notified to the lights process by a signal. The state of traffic lights is stored
  in a shared memory, accessible to the coordinator processes, at least. Communication with the
  display process is carried out via sockets.
- # DDL #
+
+ # Installation
+Clonez le dépôt : git clone https://github.com/giahg294/PPC_project.git
+Accédez au répertoire du projet : cd PPC_Project
+
+# Utilisation
+Exécutez le serveur dans un environnement Linux: python3 main.py
+
+ # DDL 
 - 09/01/2025
  project is published on Moodle
 - 06/02/2025 - 23:59
