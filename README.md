@@ -38,13 +38,13 @@ South, the other West-East. This intersection is managed by 4 bicolor lights, on
  in a shared memory, accessible to the coordinator processes, at least. Communication with the
  display process is carried out via sockets.
  # DDL #
- 09/01/2025
+- 09/01/2025
  project is published on Moodle
- 06/02/2025 - 23:59
+- 06/02/2025 - 23:59
  submission of project code (including a README explaining how to
  execute it) and report archive on Moodle, refer to organization slides for
  the content of the report
- 07/02/2025 
+- 07/02/2025 
 15-minute demonstration per project with the tutor in charge of your group
 
 
