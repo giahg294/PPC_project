@@ -1,15 +1,13 @@
 # Reste a faire :
-## Inter-process communication: Message queues
+## Output plus joli? 
+## Inter-process communication: Message queues ? Deja resolu.
 The 4 sections of the crossroads are represented by message queues,
  one per section, vehicles are represented via messages coding the vehicle’s attributes. The approach of
  a high-priority vehicle is notified to the lights process by a signal. The state of traffic lights is stored
  in a shared memory, accessible to the coordinator processes, at least. Communication with the
  display process is carried out via sockets. 
-## should we avoid "entry A exit A "?
+## should we avoid "entry A exit A "? Deja resolu.
 [Normal Traffic] New vehicle: {'type': 'normal', 'entry': 'South', 'exit': 'South'}
-[Coordinator] Normal vehicle processed: {'type': 'normal', 'entry': 'South', 'exit': 'South'}
-[Display] {'type': 'normal', 'entry': 'South', 'exit': 'South'}
- 
 
 
 
