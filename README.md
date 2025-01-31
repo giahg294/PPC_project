@@ -1,3 +1,12 @@
+# Reste a faire : Message queues #
+ Inter-process communication: The 4 sections of the crossroads are represented by message queues,
+ one per section, vehicles are represented via messages coding the vehicle’s attributes. The approach of
+ a high-priority vehicle is notified to the lights process by a signal. The state of traffic lights is stored
+ in a shared memory, accessible to the coordinator processes, at least. Communication with the
+ display process is carried out via sockets.
+
+
+
 # Objectif #
  The goal of this programming project is to design and implement a multi-process simulation in Python.
 Consider a crossroads made up of the perpendicular intersection of 2 roads, one running North
@@ -37,3 +46,5 @@ South, the other West-East. This intersection is managed by 4 bicolor lights, on
  the content of the report
  07/02/2025 
 15-minute demonstration per project with the tutor in charge of your group
+
+
