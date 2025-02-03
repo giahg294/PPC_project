@@ -1,5 +1,6 @@
 # Reste a faire :
-## turn right > turn left
+## traffic light: red/green.
+## go straight > turn right > turn left
 Vehicles respect traffic regulations: they proceed only on green light, have priority in the intersection when they want to turn right
 
 ## Output plus joli? 
