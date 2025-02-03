@@ -5,6 +5,7 @@ import os
 import signal
 import socket
 import datetime
+import ast
 
 # Constantes de direction
 N = "Nord"
@@ -43,7 +44,7 @@ section_queues = {
 def normal_traffic_gen():
     """Simule la génération aléatoire de véhicules normaux et les ajoute à la file d'attente correspondante"""
     while True:
-        time.sleep(random.randint(1, 3))  # Génération de véhicules à intervalles aléatoires
+        time.sleep(random.randint(3, 5))  # Génération de véhicules à intervalles aléatoires
         entry = random.choice(DIRECTIONS)
         exit = random.choice(DIRECTIONS)
 
@@ -107,7 +108,7 @@ def coordinator(traffic_light, display_socket):
         for direction, queue in section_queues.items():
             if not queue.empty():
                 vehicle = queue.get()
-                print(f"[Coordinateur] Véhicule traité depuis {direction} : {vehicle}")
+                print(f"[Coordinateur] Véhicule {vehicle['type']} traité depuis {direction} vers {vehicle['exit']}")
                 display_socket.sendall(str(vehicle).encode())  # Envoi des informations du véhicule au serveur d'affichage
         time.sleep(1)
 
@@ -120,11 +121,21 @@ def display_server():
     print("[Affichage] En attente de connexion...")
     conn, addr = server.accept()  # Attente de connexion
     print("[Affichage] Connecté !")
+    print("[-- Nord --] : ")
+    print("[-- Sud --] :")
+    print("[-- Est --] : ")
+    print("[-- Ouest --] : ")
+
+
     while True:
         data = conn.recv(1024)
         if not data:
             break
-        print(f"[Affichage] {data.decode()}")
+        dico = ast.literal_eval(data.decode('utf-8'))
+        type = dico['type']
+        entree = dico['entry']
+        sortie = dico['exit']    
+        print(f"[-- {entree} --] : vehicule {type} va vers {sortie}")
 
 # Fonction principale
 def main():
@@ -159,3 +170,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    quit()

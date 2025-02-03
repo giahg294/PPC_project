@@ -118,6 +118,13 @@ def vehicle_gen():
 
 # 主函数
 def main():
+    pygame.init()
+
+    # 设置窗口大小
+    window_size = (600, 600)
+    screen = pygame.display.set_mode(window_size)
+    pygame.display.set_caption("Traffic Simulation")
+    
     running = True
     vehicles = vehicle_gen()
     while running:
