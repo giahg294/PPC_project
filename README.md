@@ -1,4 +1,7 @@
 # Reste a faire :
+## turn right > turn left
+Vehicles respect traffic regulations: they proceed only on green light, have priority in the intersection when they want to turn right
+
 ## Output plus joli? 
 ## Plusieurs .py au lieu d'un seul? par ex, serveur.py + joueur.py ?
 
