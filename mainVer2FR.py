@@ -6,6 +6,7 @@ import signal
 import socket
 import datetime
 import ast
+import json
 
 # Constantes de direction
 N = "Nord"
@@ -55,10 +56,11 @@ def normal_traffic_gen():
         vehicle = {
             "type": "normal",
             "entry": entry,
-            "exit": exit
+            "exit": exit,
+            "priority": vehicle_priority({"entry": entry, "exit": exit})  # Définir la priorité
         }
         section_queues[entry].put(vehicle)
-        print(f"[Trafic Normal] Nouveau véhicule : {vehicle}")
+        print(f"[Trafic Normal] Nouveau véhicule de {vehicle['entry']} veut aller vers {vehicle['exit']} (priorité : {vehicle['priority']})")
 
 # Générateur de véhicules prioritaires (ex : ambulances, camions de pompiers)
 def priority_traffic_gen(light_pid):
@@ -75,12 +77,46 @@ def priority_traffic_gen(light_pid):
         vehicle = {
             "type": "prioritaire",
             "entry": entry,
-            "exit": exit
+            "exit": exit,
+            "priority": 0  # Les véhicules prioritaires passent en priorité
         }
 
         section_queues[entry].put(vehicle)
-        os.kill(light_pid, signal.SIGUSR1)  # Envoie un signal pour notifier la présence d'un véhicule prioritaire
-        print(f"[Trafic Prioritaire] Véhicule prioritaire détecté : {vehicle}")
+        os.kill(light_pid, signal.SIGUSR1)  # Envoie un signal pour notifier la présence d'un véhicule priority
+        print(f"[Trafic Prioritaire] Nouveau véhicule d'urgence de {vehicle['entry']} veut aller vers {vehicle['exit']}")
+
+# Règles de priorité des véhicules : aller tout droit > tourner à droite > tourner à gauche
+def vehicle_priority(vehicle):
+    entry = vehicle['entry']
+    exit = vehicle['exit']
+    if entry == N:
+        if exit == N:
+            return 0  # Priorité pour aller tout droit
+        elif exit == E:
+            return 1  # Priorité pour tourner à droite
+        else:
+            return 2  # Priorité pour tourner à gauche
+    elif entry == S:
+        if exit == S:
+            return 0
+        elif exit == W:
+            return 1
+        else:
+            return 2
+    elif entry == E:
+        if exit == E:
+            return 0
+        elif exit == N:
+            return 1
+        else:
+            return 2
+    elif entry == W:
+        if exit == W:
+            return 0
+        elif exit == S:
+            return 1
+        else:
+            return 2
 
 # Contrôleur des feux de circulation
 def light_controller(traffic_light):
@@ -95,21 +131,33 @@ def light_controller(traffic_light):
     signal.signal(signal.SIGUSR1, emergency_signal_handler)  # Enregistrement du gestionnaire de signal
     
     while True:
-        traffic_light.set_state(LIGHT_GREEN, LIGHT_RED)  # Nord-Sud vert, Est-Ouest rouge
+        # Passer au feu vert pour la direction nord-sud et rouge pour est-ouest
+        traffic_light.set_state(LIGHT_GREEN, LIGHT_RED)
+        print("[Traffic Light] Changement : Feu vert Nord-Sud, Feu rouge Est-Ouest")
         time.sleep(UPDATE_INTERVAL)
-        traffic_light.set_state(LIGHT_RED, LIGHT_GREEN)  # Nord-Sud rouge, Est-Ouest vert
+        
+        # Passer au feu rouge pour la direction nord-sud et vert pour est-ouest
+        traffic_light.set_state(LIGHT_RED, LIGHT_GREEN)
+        print("[Traffic Light] Changement : Feu rouge Nord-Sud, Feu vert Est-Ouest")
         time.sleep(UPDATE_INTERVAL)
 
 # Processus de coordination du trafic
 def coordinator(traffic_light, display_socket):
-    """Coordonne le passage des véhicules et envoie les données au serveur d'affichage"""
+    """Coordonner la circulation des véhicules et envoyer les données au serveur d'affichage"""
     while True:
         ns, we = traffic_light.get_state()
+        # Obtenir les files d'attente pour toutes les directions
         for direction, queue in section_queues.items():
             if not queue.empty():
                 vehicle = queue.get()
-                print(f"[Coordinateur] Véhicule {vehicle['type']} traité depuis {direction} vers {vehicle['exit']}")
-                display_socket.sendall(str(vehicle).encode())  # Envoi des informations du véhicule au serveur d'affichage
+                if (vehicle['entry'] in [N, S] and ns == LIGHT_GREEN) or (vehicle['entry'] in [E, W] and we == LIGHT_GREEN):
+                    # Si les feux sont verts, le véhicule peut passer
+                    display_socket.sendall((json.dumps(vehicle) + "\n").encode())  # Send each vehicle as a separate JSON object with a newline
+                    print(f"[Coordinator] Vehicule de {vehicle['entry']} vers {vehicle['exit']} a traversé l'intersection.")
+                else:
+                    # Si les feux sont rouges, le véhicule doit attendre
+                    queue.put(vehicle)  # Remettre le véhicule dans la file d'attente
+                    display_socket.sendall((json.dumps(vehicle) + "\n").encode())  # Send each vehicle as a separate JSON object with a newline
         time.sleep(1)
 
 # Serveur d'affichage (reçoit et affiche les informations des véhicules)
@@ -119,33 +167,40 @@ def display_server():
     server.bind(("localhost", 6666))  # Liaison au port local
     server.listen(1)
     print("[Affichage] En attente de connexion...")
-    conn, addr = server.accept()  # Attente de connexion
-    print("[Affichage] Connecté !")
-    print("[-- Nord --] : ")
-    print("[-- Sud --] :")
-    print("[-- Est --] : ")
-    print("[-- Ouest --] : ")
-
-
     while True:
-        data = conn.recv(1024)
-        if not data:
-            break
-        dico = ast.literal_eval(data.decode('utf-8'))
-        type = dico['type']
-        entree = dico['entry']
-        sortie = dico['exit']    
-        print(f"[-- {entree} --] : vehicule {type} va vers {sortie}")
+        client_socket, _ = server.accept()
+        buffer = ""
+        print("[Affichage] Connecté !")
+        print("[-- Nord --] : ")
+        print("[-- Sud --] :")
+        print("[-- Est --] : ")
+        print("[-- Ouest --] : ")
 
+        while True:
+            data = client_socket.recv(1024).decode()
+            if not data:
+                break
+
+            buffer += data  # Append new data to buffer
+            while "\n" in buffer:  # Process only complete JSON objects
+                json_str, buffer = buffer.split("\n", 1)  # Split at the first newline
+                dico = json.loads(json_str)  # Convert JSON string to dictionar
+                # dico = ast.literal_eval(data.decode())
+                type = dico['type']
+                entree = dico['entry']
+                sortie = dico['exit']    
+                print(f"[-- {entree} --] : vehicule {type} va vers {sortie}")
+    client_socket.close()
+    
 # Fonction principale
 def main():
-    traffic_light = TrafficLight()  # Objet feu de circulation
+    traffic_light = TrafficLight()  # Objet pour les feux de circulation
 
     # Démarrer le processus du serveur d'affichage
     display_process = mp.Process(target=display_server)
     display_process.start()
     
-    time.sleep(1)  # Attente du démarrage du serveur
+    time.sleep(1)  # Attendre que le serveur démarre
 
     display_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     display_socket.connect(("localhost", 6666))  # Connexion au serveur d'affichage
@@ -161,7 +216,7 @@ def main():
     coordinator_process.start()
     normal_traffic_process.start()
     
-    # Attente de la fin des processus
+    # Attendre la fin des processus
     light_process.join()
     coordinator_process.join()
     normal_traffic_process.join()
@@ -170,4 +225,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    quit()

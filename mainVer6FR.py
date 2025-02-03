@@ -149,12 +149,12 @@ def coordinator(traffic_light, display_socket):
                 vehicle = queue.get()
                 if (vehicle['entry'] in [N, S] and ns == LIGHT_GREEN) or (vehicle['entry'] in [E, W] and we == LIGHT_GREEN):
                     # Si les feux sont verts, le véhicule peut passer
-                    display_socket.sendall(f"Vehicle from {vehicle['entry']} going to {vehicle['exit']} with priority {vehicle['priority']}, Light: Green\n".encode())
+                    display_socket.sendall(f"Vehicle from {vehicle['entry']} going to {vehicle['exit']} with priority {vehicle['priority']}, Light: Green".encode())
                     print(f"[Coordinator] Vehicle from {vehicle['entry']} going to {vehicle['exit']} has passed through the intersection.")
                 else:
                     # Si les feux sont rouges, le véhicule doit attendre
                     queue.put(vehicle)  # Remettre le véhicule dans la file d'attente
-                    display_socket.sendall(f"Vehicle from {vehicle['entry']} going to {vehicle['exit']} with priority {vehicle['priority']}, Light: Red (Waiting)\n".encode())
+                    display_socket.sendall(f"Vehicle from {vehicle['entry']} going to {vehicle['exit']} with priority {vehicle['priority']}, Light: Red (Waiting)".encode())
         time.sleep(1)
 
 
