@@ -1,0 +1,55 @@
+[Display] Connected!  # 系统成功连接。
+[Traffic Light] State changed: South-North Green, East-West Red  # 交通信号灯状态发生变化：南北方向绿灯，东西方向红灯。
+[Normal Traffic] New vehicle: {'type': 'normal', 'entry': 'East', 'exit': 'North', 'priority': 1}  # 进入系统的新车：正常车辆，来自东侧，目标是北侧，优先级1。
+[Coordinator] Vehicle from East going to North is waiting.  # 来自东侧、目标北侧的车辆正在等待。
+[Display] Vehicle from East going to North with priority 1, Light: Red (Waiting)  # 来自东侧、目标北侧的优先级为1的车辆，信号灯为红灯，正在等待。
+
+[Traffic Light] State changed: South-North Red, East-West Green  # 交通信号灯状态发生变化：南北方向红灯，东西方向绿灯。
+[Normal Traffic] New vehicle: {'type': 'normal', 'entry': 'South', 'exit': 'East', 'priority': 1}  # 进入系统的新车：正常车辆，来自南侧，目标是东侧，优先级1。
+[Display] Vehicle from South going to East with priority 1, Light: Red (Waiting)  # 来自南侧、目标东侧的优先级为1的车辆，信号灯为红灯，正在等待。
+
+[Coordinator] Vehicle from South going to East is waiting.  # 来自南侧、目标东侧的车辆正在等待。
+[Coordinator] Vehicle from East going to North has passed through the intersection.  # 来自东侧、目标北侧的车辆已通过交叉口。
+[Display] Vehicle from East going to North with priority 1, Light: Green  # 来自东侧、目标北侧的优先级为1的车辆，信号灯变绿，已通过交叉口。
+
+[Priority Traffic] Emergency vehicle detected: {'type': 'priority', 'entry': 'South', 'exit': 'North', 'priority': -1}  # 检测到紧急车辆：来自南侧，目标北侧，优先级-1。
+[Traffic Light] Emergency mode activated!  # 激活紧急模式，信号灯改变以优先通过紧急车辆。
+[Coordinator] Vehicle from South going to East is waiting.  # 来自南侧、目标东侧的车辆正在等待。
+[Display] Vehicle from South going to East with priority 1, Light: Red (Waiting)  # 来自南侧、目标东侧的优先级为1的车辆，信号灯为红灯，正在等待。
+
+[Normal Traffic] New vehicle: {'type': 'normal', 'entry': 'North', 'exit': 'East', 'priority': 2}  # 进入系统的新车：正常车辆，来自北侧，目标是东侧，优先级2。
+[Coordinator] Vehicle from North going to East is waiting.  # 来自北侧、目标东侧的车辆正在等待。
+[Coordinator] Emergency vehicle from South going to North has passed through the intersection.  # 来自南侧、目标北侧的紧急车辆已通过交叉口。
+[Display] Vehicle from North going to East with priority 2, Light: Red (Waiting)  # 来自北侧、目标东侧的优先级为2的车辆，信号灯为红灯，正在等待。
+
+[Coordinator] Vehicle from North going to East is waiting.  # 来自北侧、目标东侧的车辆正在等待。
+[Display] Vehicle from North going to East with priority 2, Light: Red (Waiting)  # 来自北侧、目标东侧的优先级为2的车辆，信号灯为红灯，正在等待。
+
+[Display] Vehicle from South going to East with priority 1, Light: Red (Waiting)  # 来自南侧、目标东侧的优先级为1的车辆，信号灯为红灯，正在等待。
+
+[Coordinator] Vehicle from South going to East is waiting.  # 来自南侧、目标东侧的车辆正在等待。
+[Normal Traffic] New vehicle: {'type': 'normal', 'entry': 'East', 'exit': 'West', 'priority': 0}  # 进入系统的新车：正常车辆，来自东侧，目标是西侧，优先级0。
+[Coordinator] Vehicle from North going to East has passed through the intersection.  # 来自北侧、目标东侧的车辆已通过交叉口。
+[Coordinator] Vehicle from South going to East has passed through the intersection.  # 来自南侧、目标东侧的车辆已通过交叉口。
+[Display] Vehicle from North going to East with priority 2, Light: Green  # 来自北侧、目标东侧的优先级为2的车辆，信号灯变绿，已通过交叉口。
+
+[Display] Vehicle from South going to East with priority 1, Light: Green  # 来自南侧、目标东侧的优先级为1的车辆，信号灯变绿，已通过交叉口。
+
+[Display] Vehicle from East going to West with priority 0, Light: Red (Waiting)  # 来自东侧、目标西侧的优先级为0的车辆，信号灯为红灯，正在等待。
+
+[Coordinator] Vehicle from East going to West is waiting.  # 来自东侧、目标西侧的车辆正在等待。
+[Traffic Light] State changed: South-North Green, East-West Red  # 交通信号灯状态发生变化：南北方向绿灯，东西方向红灯。
+[Coordinator] Vehicle from East going to West is waiting.  # 来自东侧、目标西侧的车辆正在等待。
+[Display] Vehicle from East going to West with priority 0, Light: Red (Waiting)  # 来自东侧、目标西侧的优先级为0的车辆，信号灯为红灯，正在等待。
+
+[Normal Traffic] New vehicle: {'type': 'normal', 'entry': 'West', 'exit': 'East', 'priority': 0}  # 进入系统的新车：正常车辆，来自西侧，目标是东侧，优先级0。
+[Coordinator] Vehicle from West going to East is waiting.  # 来自西侧、目标东侧的车辆正在等待。
+[Display] Vehicle from West going to East with priority 0, Light: Red (Waiting)  # 来自西侧、目标东侧的优先级为0的车辆，信号灯为红灯，正在等待。
+
+[Display] Vehicle from East going to West with priority 0, Light: Red (Waiting)  # 来自东侧、目标西侧的优先级为0的车辆，信号灯为红灯，正在等待。
+
+[Coordinator] Vehicle from East going to West is waiting.  # 来自东侧、目标西侧的车辆正在等待。
+[Coordinator] Vehicle from West going to East is waiting.  # 来自西侧、目标东侧的车辆正在等待。
+[Coordinator] Vehicle from East going to West is waiting.  # 来自东侧、目标西侧的车辆正在等待。
+[Display] Vehicle from West going to East with priority 0, Light: Red (Waiting)  # 来自西侧、目标东侧的优先级为0的车辆，信号灯为红灯，正在等待。
+Vehicle from East going to West with priority 0, Light: Red (Waiting)  # 来自东侧、目标西侧的优先级为0的车辆，信号灯为红灯，正在等待。
