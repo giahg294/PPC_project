@@ -1,16 +1,3 @@
-请你帮我修改这个模拟十字路口的代码。需要你添加救护车到来的情况。
-
-
-修改 TrafficLight 类:原来只有两个信号灯的状态（南北方向和东西方向），现在需要为每个方向单独设置一个信号灯的状态。
-在 coordinator 函数中，每次控制交通时，不再只控制南北或东西方向，而是针对每个方向的信号灯进行控制。
-在没有救护车到来时，南北方向信号灯一致，东西方向信号灯一致。
-当有紧急救护车时，只有它来方向的信号灯为绿，其他方向的信号灯都为红。
-然后要确保其他方向的车都不通过路口，而是等待救护车通过。
-救护车通过后，要变回普通状态，使南北信号灯为绿，东西为红。
-
-添加救护车相关的output。
-
-以下是我的代码：
 import multiprocessing as mp
 import random
 import time
@@ -34,20 +21,32 @@ OPPOSITE_DIR = {
     E: W, W: E
 }
 
+
 class TrafficLight:
     def __init__(self):
-        self.light_state = mp.Array('i', [LIGHT_GREEN, LIGHT_RED])  # NS, WE
+        # 初始化时，所有方向的信号灯都为红灯
+        self.lights = {
+            N: LIGHT_RED,  # North
+            S: LIGHT_RED,  # South
+            E: LIGHT_RED,  # East
+            W: LIGHT_RED   # West
+        }
 
-    def set_state(self, ns, we):
-        self.light_state[0] = ns
-        self.light_state[1] = we
-        if ns == LIGHT_GREEN:
-            print("南北方向信号灯变绿。东西方向信号灯变红。    North——South ok .", flush=True)
+    def set_state(self, direction, state):
+        """ 设置指定方向的信号灯状态 """
+        self.lights[direction] = state
+        if state == LIGHT_GREEN:
+            print(f"{direction} 方向信号灯变绿。")
         else:
-            print("东西方向信号灯变绿。南北方向信号灯变红。    East——West ok .", flush=True)
+            print(f"{direction} 方向信号灯变红。")
 
     def get_state(self):
-        return self.light_state[0], self.light_state[1]
+        """ 返回所有方向的信号灯状态 """
+        return self.lights
+
+# 新增：标记是否有紧急救护车
+def ambulance_priority(entry, exit):
+    return -1  # 救护车总是优先
 
 def vehicle_priority(entry, exit):
     dir_map = {
@@ -64,6 +63,33 @@ def generate_license_plate():
     with global_car_id.get_lock():
         global_car_id.value += 1
         return f"CAR-{global_car_id.value:04d}"
+
+# 新增：模拟救护车生成
+def ambulance_gen(section_queues, emergency_flag):
+    while True:
+        time.sleep(random.randint(15, 30))  # 救护车到来的间隔时间
+        entry = random.choice(DIRECTIONS)
+        exit = random.choice([d for d in DIRECTIONS if d != entry])
+        
+        vehicle = {
+            "license_plate": f"AMB-{random.randint(1000, 9999)}",
+            "type": "priority",
+            "entry": entry,
+            "exit": exit,
+            "priority": ambulance_priority(entry, exit)
+        }
+        
+        # 通知有救护车到来
+        emergency_flag.value = 1
+        section_queues[entry].append(vehicle)
+        
+        print(f"\n=== 🚑 [EMERGENCY] 救护车 {vehicle['license_plate']} 从 {entry} 方向驶入 {exit} 方向 ===")
+        print(f"🚨 救护车来了！所有信号灯变红，{entry} 方向信号灯变绿！🚦")
+        
+        time.sleep(5)  # 假设救护车需要5秒钟通过路口
+        
+        print("🚑 救护车走了！信号灯恢复正常。🚦")
+        emergency_flag.value = 0  # 标记救护车已离开
 
 def normal_traffic_gen(section_queues):
     while True:
