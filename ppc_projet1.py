@@ -58,7 +58,7 @@ class TrafficLight:
             self.emergency_mode.value = False
             self.emergency_direction.value = -1
         print(f"Changement des feux - {N} et {S}sont {'Verts' if ns_green else 'Rouges'}，{E} et {W} sont {'Verts' if we_green else 'Rougs'}")
-
+        time.sleep(3)
     def enter_emergency_mode(self, direction):
         with self.lock:
             dir_index = DIR_INDEX[direction]
@@ -70,15 +70,19 @@ class TrafficLight:
             self.emergency_direction.value = dir_index
             self.emergency_count.value += 1
         print("\n!!! 🚑 Mode urgence activé ---")
+        time.sleep(3)
         
         self.print_light_states()
+        time.sleep(3)
 
     def exit_emergency_mode(self):
         with self.lock:
             self.emergency_mode.value = False
         self.set_normal_state(LIGHT_GREEN, LIGHT_RED)
         print("\n!!! Mode urgence désactivé, retour à la normale !!!")
+        time.sleep(3)
         self.print_light_states()
+        time.sleep(3)
 
 
 # === Génération des plaques d'immatriculation ===
@@ -174,6 +178,7 @@ def display_server(traffic_light, section_queues, msg_queue):
         if not msg_queue.empty():
             emergency_msg = msg_queue.get()
             print(f"\n!!! Véhicule d'urgence arrive：{emergency_msg} !!!")
+            time.sleep(3)
         time.sleep(1)
 
 
@@ -207,7 +212,7 @@ def light_controller(traffic_light, emergency_event, msg_queue, emergency_flag):
             traffic_light.set_normal_state(new_ns, LIGHT_RED if new_ns == LIGHT_GREEN else LIGHT_GREEN)
             # Si l'état a changé, envoyer une mise à jour
             if last_state != traffic_light.light_states[:]:
-                send_to_display(f"Traffic light updated: {new_ns}  (Rouge==0 et Vert==1)", msg_queue)
+                send_to_display(f"Traffic light updated: {new_ns}  (NS==Rouge si 0 et NS==Vert si 1)", msg_queue)
                 last_state = traffic_light.light_states[:]
                 traffic_light.print_light_states()  # Afficher les nouveaux états des feux de signalisation
         time.sleep(UPDATE_INTERVAL)
@@ -250,6 +255,7 @@ def ambulance_gen(section_queues, traffic_light, emergency_event, msg_queue, eme
         # insérer le véhicule en tête de la queue
         section_queues[entry].insert(0, vehicle)
         print(f"\n--- !!! Véhicule d'urgence  {vehicle['license_plate']} entrant par la direction {entry}, destination {exit_dir} ---")
+        time.sleep(3)
 
         # Signaler l'événement d'urgence
         emergency_event.set()  # Définir le drapeau d'événement d'urgence
@@ -258,7 +264,6 @@ def ambulance_gen(section_queues, traffic_light, emergency_event, msg_queue, eme
         traffic_light.enter_emergency_mode(entry)
 
         if not emergency_flag.value:
-
             msg_queue.put(f"Véhicule d'urgence {vehicle['license_plate']} arrive, destination {exit_dir}")
             emergency_flag.value = True
 
