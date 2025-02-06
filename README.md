@@ -1,4 +1,4 @@
-# Simulation de Trafic à un Carrefour
+# Simulation de Trafic ： At the crossroads
 
 ## Description
 Ce programme simule le contrôle du trafic à un carrefour avec feux de signalisation, véhicules normaux et véhicules prioritaires (ambulances). Il utilise des processus parallèles et divers mécanismes de communication interprocessus pour gérer les feux, les véhicules et les priorités.
@@ -10,6 +10,7 @@ Ce programme simule le contrôle du trafic à un carrefour avec feux de signalis
 
 ### Lancer la simulation :
 1. Assurez-vous que Python est installé.
-2. Exécutez la commande suivante dans le terminal :
+2. Exécutez la commande suivante dans le terminal Linux:
    ```sh
-   python light1247francais.py
+   python3 ppc_projet.py
+3. La simulation affiche en temps réel l’état des feux et des véhicules.
