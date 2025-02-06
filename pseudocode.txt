@@ -1,0 +1,57 @@
+FUNCTION coordinator(traffic_light, section_queues, msg_queue):
+
+    FUNCTION process_direction(direction):
+        processed ← []  // Liste des véhicules ayant reçu l'autorisation de passer
+
+        IF traffic_light.get_light_state(direction) ≠ LIGHT_GREEN THEN:
+            RETURN processed  // Aucun véhicule ne peut passer si le feu n'est pas vert
+
+        // Trier les véhicules de la file selon la priorité (droite > droite > gauche)
+        vehicles ← SORT(section_queues[direction], key=priority)
+
+        FOR v IN vehicles DO:
+            can_pass ← FALSE
+            opp_dir ← OPPOSITE_DIR[direction]
+
+            IF v.type == "priority" THEN:
+                can_pass ← TRUE
+            ELSE IF v.priority == 1 THEN:  // Aller tout droit
+                can_pass ← TRUE
+            ELSE IF v.priority == 2 THEN:  // Tourner à droite
+                can_pass ← TRUE
+            ELSE IF v.priority == 3 THEN:  // Tourner à gauche
+                IF NOT EXISTS(p IN section_queues[opp_dir] WHERE p.priority == 1) THEN:
+                    can_pass ← TRUE
+                ENDIF
+            ENDIF
+
+            IF can_pass THEN:
+                ADD v TO processed
+                REMOVE v FROM section_queues[direction]  // Retirer le véhicule traité
+
+                // Déterminer l'action correspondante
+                action ← ["va tout droit", "tourne à droite", "tourne à gauche"][v.priority - 1]
+
+                // Envoyer le message au système d'affichage
+                SEND "Véhicule " + v.license_plate + " a passé : " + v.entry + " → " + v.exit + " (" + action + ")" TO msg_queue
+            ENDIF
+        ENDFOR
+
+        RETURN processed
+    ENDFUNCTION
+
+    WHILE TRUE DO:
+        IF traffic_light.emergency_mode.value THEN:
+            emergency_dir ← DIR_INDEX_REVERSE[traffic_light.emergency_direction.value]
+            IF emergency_dir EXISTS THEN:
+                process_direction(emergency_dir)
+            ENDIF
+        ELSE:
+            FOR d IN DIRECTIONS DO:
+                process_direction(d)
+            ENDFOR
+        ENDIF
+
+        SLEEP(1)  // Pause de 1 seconde avant la prochaine vérification
+    ENDWHILE
+ENDFUNCTION
