@@ -235,6 +235,7 @@ def normal_traffic_gen(section_queues):
         }
         section_queues[entry].append(vehicle)
         print(f"\n--- Nouveau véhicule {vehicle['license_plate']} entrant par la direction {entry} ---")
+        time.sleep(3)
 
 
 # priority_traffic_gen
